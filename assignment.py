@@ -1,19 +1,27 @@
 from flask import Flask, request
 from flask_cors import CORS
 import random
-import json
 from loadsql import loadsqlmain
-import addnewsql
+import sqlite3
 
 
 app = Flask(__name__)   # creates a flask server with name/handle of app
 CORS(app)               # applies cross domain object requests to app
 
-alldata1 = loadsqlmain()
-alldata = alldata1["alllist"]
-quotes1 = alldata1["quotes"]
-jokes1 = alldata1["jokes"]
-factoftheday1 = alldata1["fact-of-the-day"]
+file = 'dbdb.db'
+connection = sqlite3.connect(file)
+cursor = connection.cursor()
+
+
+alldata = []
+query = "select quotes from Quotes"
+cursor.execute(query)
+result = cursor.fetchall()
+quotes = result
+for i in quotes:
+    alldata.append(i[0])
+
+
 
 aa = random.choice(alldata)
 print(aa)
@@ -23,15 +31,8 @@ print(aa)
 def main():
     aa = random.choice(alldata)
     print(aa)
-    if aa in jokes1:
-        bb = "Jokes"
-    if aa in quotes1:
-        bb = "Quotes"
-    if aa in factoftheday1:
-        bb = "Fact of the day"
     return f"""
     <h1>{aa}</h1>
-    {bb}
     """
 
 @app.route("/post", methods=['POST'])
@@ -39,19 +40,15 @@ def post():
     returnn = None
     payload = request.form
     data = dict(payload)
-    for i in alldata1:
-        if data["post1"] in i:
-            print(data["post1"])
-            returnn = True
-    if returnn == None:
-        if data["type"] == "quotes":
-            addnewsql.addnewQuote(data["post1"])
-        elif data["type"] == "jokes":
-            addnewsql.addnewJokes(data["post1"])
-        elif data["type"] == "factoftheday":
-            addnewsql.addnewFactoftheday(data["post1"])
-    addnewsql.save()
-    return "True"
+    token = data["post1"]
+    q = f"select * from Quotes where quotes like '{token}'"
+    r = cursor.execute(q)
+    datadata = list(r)
+    if len(datadata) == 0:
+        q = f'insert into Quotes (quotes) values ("{token}")'
+        cursor.execute(q)
+        
+    return 
 
 
 
