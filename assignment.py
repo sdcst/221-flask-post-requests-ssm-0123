@@ -1,7 +1,6 @@
 from flask import Flask, request
 from flask_cors import CORS
 import random
-from loadsql import loadsqlmain
 import sqlite3
 
 
@@ -37,21 +36,38 @@ def main():
 
 @app.route("/post", methods=['POST'])
 def post():
-    returnn = None
     payload = request.form
     data = dict(payload)
     token = data["post1"]
-    q = f"select * from Quotes where quotes like '{token}'"
+    for i in alldata:
+        if token in i:
+            return "It does already exist"
+
+    q = f'insert into Quotes (quotes) values ("{token}")'
+    cursor.execute(q)
+    connection.commit()
+    return """
+    Hello
+    """
+
+
+"""
+@app.route("/requestlist", methods=['POST','GET'])
+def listprint():
+    
+    payload = request.form
+    data = dict(payload)
+    token = data["hello"]
+    allQuotes = []
+    q = f"select * from Quotes"
     r = cursor.execute(q)
     datadata = list(r)
-    if len(datadata) == 0:
-        q = f'insert into Quotes (quotes) values ("{token}")'
-        cursor.execute(q)
-        
+    for i in data:
+        allQuotes.append(i[0])
+    allQuotes = sorted(allQuotes)
+
     return 
-
-
-
+"""
 
 
 
