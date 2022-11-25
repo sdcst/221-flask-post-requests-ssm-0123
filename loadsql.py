@@ -1,7 +1,23 @@
 
 import sqlite3
 
+file = 'dbdb.db'
+connection = sqlite3.connect(file)
+cursor = connection.cursor()
 
+
+query = "select * from Quotes"
+cursor.execute(query)
+result = cursor.fetchall()
+quotes = result
+
+print(quotes)
+
+
+
+
+
+"""
 def loadsqlmain():
 
     file = 'dbdb.db'
@@ -55,3 +71,4 @@ def loadsqlmain():
         "fact-of-the-day": factoftheday1
     }
     return output
+"""

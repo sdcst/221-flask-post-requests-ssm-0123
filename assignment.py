@@ -1,3 +1,4 @@
+from os import close
 from flask import Flask, request
 from flask_cors import CORS
 import random
@@ -20,7 +21,7 @@ quotes = result
 for i in quotes:
     alldata.append(i[0])
 
-
+connection.close()
 
 aa = random.choice(alldata)
 print(aa)
@@ -36,6 +37,7 @@ def main():
 
 @app.route("/post", methods=['POST'])
 def post():
+    cursor = connection.cursor()
     payload = request.form
     data = dict(payload)
     token = data["post1"]
@@ -46,28 +48,33 @@ def post():
     q = f'insert into Quotes (quotes) values ("{token}")'
     cursor.execute(q)
     connection.commit()
-    return """
-    Hello
+    connection.close()
+    return f"""
+    {data["post1"]} is added
     """
 
 
-"""
+
 @app.route("/requestlist", methods=['POST','GET'])
 def listprint():
-    
+    connection = sqlite3.connect(file)
+    cursor = connection.cursor()
     payload = request.form
     data = dict(payload)
-    token = data["hello"]
-    allQuotes = []
-    q = f"select * from Quotes"
+    token = data["type"]
+    requestdatalist =[]
+    q = f"select * from {token}"
     r = cursor.execute(q)
     datadata = list(r)
-    for i in data:
-        allQuotes.append(i[0])
-    allQuotes = sorted(allQuotes)
+    for i in datadata:
+        requestdatalist.append(i[0])
+    requestdatalist = sorted(requestdatalist)
+    returnn = ""
+    for i in requestdatalist:
+        returnn = returnn +"\n" +i
+    connection.close()
+    return returnn
 
-    return 
-"""
 
 
 
